@@ -10,19 +10,19 @@
 #ifndef QUERY_WRITER_H
 #define QUERY_WRITER_H
 
-#include "HashtagQueue.h"
+#define OUTPUT_FILENAME "output_file.txt"
 
+#include <fstream>
 #include <string>
-#include <thread>
 
 class QueryWriter
 {
 public:
-    QueryWriter(string inputFilename, HashtagQueue tagQueue){filename = inputFilename; writeQueue = tagQueue;}
-
+    QueryWriter(){outStream.open(OUTPUT_FILENAME);}
+    WriteToFile(string queryResult){outStream << queryResult;}
+    CloseFile(){outStream.close();}
 private:
-    string filename;
-    HashtagQueue writeQueue;
+    ofstream outStream;
 };
 
 #endif /* QUERY_WRITER_H */
