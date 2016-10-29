@@ -21,7 +21,7 @@
 #include <iostream>
 #include <sys/stat.h>
 
- using namespace std;
+using namespace std;
 
 /**************************************************************
  * 		HashtagCounter Main Method
