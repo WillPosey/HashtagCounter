@@ -17,10 +17,12 @@ struct Node
     Node* parent;
     Node* leftSibling;
     Node* rightSibling;
-    vector<Node*> children;
+    Node* child;
     bool childCut;
     long degree;
     long value;
+
+    Node(long val) : value(val)
 };
 
 class MaxFibonacciHeap
