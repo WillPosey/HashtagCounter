@@ -25,7 +25,7 @@ void HashtagProcessor::StartProcessing()
     // while hashtags to read from queue
     // read
     // if query, processquery
-    // if hashtag, increase key
+    // if hashtag, insert or increase key
 }
 
 /**************************************************************
@@ -53,8 +53,7 @@ string HashtagProcessor::GetMostFrequentHashtags(int numHashtags)
  **************************************************************/
 void HashtagProcessor::ProcessQuery(int numHashtags)
 {
-    // calls GetMostFrequenctHashtags
-    // sends the string to query writer
+    writer.WriteToFile(GetMostFrequentHashtags(numHashtags));
 }
 
 

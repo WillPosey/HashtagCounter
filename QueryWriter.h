@@ -19,8 +19,8 @@ class QueryWriter
 {
 public:
     QueryWriter(){outStream.open(OUTPUT_FILENAME);}
-    WriteToFile(string queryResult){outStream << queryResult;}
-    CloseFile(){outStream.close();}
+    void WriteToFile(string queryResult){outStream << queryResult;}
+    void CloseFile(){outStream.close();}
 private:
     ofstream outStream;
 };

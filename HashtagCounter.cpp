@@ -45,7 +45,7 @@ int main(int argc, char** argv)
 
     HashtagQueue tagQueue;                              // Queue used for reader and writer synchronization
     HashtagReader tagReader (inputFilename, tagQueue);  // Construct HashtagReader and start thread
-    HashtagProcessor tagProcessor (tagQueue);           // Construct HashtagProcessor and start thread
+    HashtagProcessor tagProcessor (tagQueue);           // Construct HashtagProcessor
     HashtagProcessor.StartProcessing();                 // Process Hashtag frequencies and queries
 
 	return 0;
