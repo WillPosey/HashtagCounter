@@ -15,6 +15,8 @@
 HashtagProcessor::HashtagProcessor(HashtagQueue tagQ) : tagQueue(tagQ)
 {
     // init fibheap
+    fibonacciHeap.Initialize();
+
 }
 
 /**************************************************************
@@ -26,6 +28,39 @@ void HashtagProcessor::StartProcessing()
     // read
     // if query, processquery
     // if hashtag, insert or increase key
+    string hashtag;
+    while(tagQueue.ReadQueue(hashtag))
+    {
+        if(IsQuery(hashtag))
+        {
+            continue;
+        }
+
+        if(HashtagExists(hashtag))
+        {
+
+        }
+        else
+        {
+
+        }
+    }
+}
+
+/**************************************************************
+ * 		HashtagProcessor::StartProcessing
+ **************************************************************/
+bool HashtagProcessor::HashtagExists(string hashtag)
+{
+
+}
+
+/**************************************************************
+ * 		HashtagProcessor::StartProcessing
+ **************************************************************/
+void HashtagProcessor::InsertNewHashtag(string hashtag, int initialAmount)
+{
+
 }
 
 /**************************************************************

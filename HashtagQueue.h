@@ -14,6 +14,8 @@
 #include <string>
 #include <queue>
 #include <mutex>
+#include <thread>
+#include <chrono>
 
 using namespace std;
 
@@ -31,7 +33,11 @@ public:
 
         queueMutex.lock();
 
-        while(hashtagQueue.empty());
+        while(hashtagQueue.empty())
+        {
+            queueMutex.unlock();
+            this_thread::sleep_for(chrono::seconds(1));
+        }
 
         tagEntry = hashtagQueue.front();
         hashtagQueue.pop();

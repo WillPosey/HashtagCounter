@@ -23,7 +23,9 @@ public:
     HashtagProcessor(HashtagQueue tagQ);
     void StartProcessing();
 private:
-    void IncreaseHashtagFrequency(string hashtag, int amount);
+    bool HashtagExists(string hashtag);
+    void InsertNewHashtag(string hashtag, int initialAmount);
+    void IncreaseHashtagFrequency(string hashtag, int increaseAmount);
     string GetMostFrequentHashtags(int numHashtags);
     void ProcessQuery(int numHashtags);
 
