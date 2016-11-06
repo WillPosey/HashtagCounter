@@ -9,6 +9,8 @@
  ******************************************************************************************/
 #include "HashtagProcessor.h"
 
+#include <cstring>
+
 /**************************************************************
  * 		HashtagProcessor Constructor
  **************************************************************/
@@ -28,22 +30,24 @@ void HashtagProcessor::StartProcessing()
     // read
     // if query, processquery
     // if hashtag, insert or increase key
-    string hashtag;
-    while(tagQueue.ReadQueue(hashtag))
+    string readStr, hashtag;
+    int frequency;
+
+    while(tagQueue.ReadQueue(readStr))
     {
-        if(IsQuery(hashtag))
+        if(IsQuery(readStr))
         {
+            ProcessQuery(atoi(readStr.c_str()));
             continue;
         }
 
-        if(HashtagExists(hashtag))
-        {
+        GetHashtag(readStr, hashtag);
+        GetHashtagFreqeuncy(readStr, frequency);
 
-        }
+        if(HashtagExists(readStr))
+            IncreaseHashtagFrequency(hashtag, frequency);
         else
-        {
-
-        }
+            InsertNewHashtag(hashtag, frequency);
     }
 }
 
@@ -52,7 +56,20 @@ void HashtagProcessor::StartProcessing()
  **************************************************************/
 bool HashtagProcessor::HashtagExists(string hashtag)
 {
+    static unordered_map<string, Node*>::const_iterator found;
 
+    found = hashTable.find(hashtag);
+    if(found == hashTable.end())
+        return false;
+    return true;
+}
+
+/**************************************************************
+ * 		HashtagProcessor::IsQuery
+ **************************************************************/
+bool HashtagProcessor::IsQuery(string check)
+{
+    return !(check[0] == '#');
 }
 
 /**************************************************************
@@ -60,7 +77,11 @@ bool HashtagProcessor::HashtagExists(string hashtag)
  **************************************************************/
 void HashtagProcessor::InsertNewHashtag(string hashtag, int initialAmount)
 {
-
+    Node* newNode = hashTable[hashtag];
+    newNode = new Node();
+    newNode->value = initialAmount;
+    reverseHashTable[newNode] = hashtag;
+    fibonacciHeap.Insert(newNode);
 }
 
 /**************************************************************
@@ -68,8 +89,8 @@ void HashtagProcessor::InsertNewHashtag(string hashtag, int initialAmount)
  **************************************************************/
 void HashtagProcessor::IncreaseHashtagFrequency(string hashtag, int amount)
 {
-    // get node from hashtable
-    // call increase key on node (what if new node?)
+    Node* incNode = hashTable[hashtag];
+    fibonacciHeap.IncreaseKey(incNode, amount);
 }
 
 /**************************************************************
@@ -77,10 +98,41 @@ void HashtagProcessor::IncreaseHashtagFrequency(string hashtag, int amount)
  **************************************************************/
 string HashtagProcessor::GetMostFrequentHashtags(int numHashtags)
 {
-    /*  Get numHashtags most freqeunct hashtags from fibheap (n removeMax)
+    /*  Get numHashtags most frequent hashtags from fibheap (n removeMax)
      *  create string of the hashtags
      *  insert n hashtags to fibheap
      */
+    Node* nodeArray[numHashtags];
+    string hashtags = "";
+
+    for(int i=0; i<numHashtags; i++)
+    {
+        nodeArray[i] = fibonacciHeap.RemoveMax();
+        hashtags += reverseHashTable[nodeArray[i]] + ",";
+    }
+    for(int i=0; i<numHashtags; i++)
+        fibonacciHeap.Insert(nodeArray[i]);
+
+    return hashtags;
+
+}
+
+/**************************************************************
+ * 		HashtagProcessor::GetHashtag
+ **************************************************************/
+void HashtagProcessor::GetHashtag(string input, string& hashtag)
+{
+    hashtag = input.substr(0, input.find(' '));
+}
+
+/**************************************************************
+ * 		HashtagProcessor::GetHashtagFreqeuncy
+ **************************************************************/
+void HashtagProcessor::GetHashtagFreqeuncy(string input, int& frequency)
+{
+    int start = input.find(' ')+1;
+    string freqStr = input.substr(start, input.length - start);
+    frequency = atoi(freqStr.c_str());
 }
 
 /**************************************************************

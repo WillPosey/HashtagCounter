@@ -23,10 +23,16 @@ public:
     HashtagProcessor(HashtagQueue tagQ);
     void StartProcessing();
 private:
+    bool IsQuery(string check);
     bool HashtagExists(string hashtag);
+
     void InsertNewHashtag(string hashtag, int initialAmount);
     void IncreaseHashtagFrequency(string hashtag, int increaseAmount);
+
     string GetMostFrequentHashtags(int numHashtags);
+    void GetHashtag(string input, string& hashtag);
+    void GetHashtagFreqeuncy(string input, int& frequency);
+
     void ProcessQuery(int numHashtags);
 
     unordered_map<string, Node*> hashTable;
