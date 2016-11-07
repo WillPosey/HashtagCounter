@@ -32,18 +32,18 @@ public:
         if(!moreData)
             return false;
 
-        queueMutex.lock();
 
         while(hashtagQueue.empty())
         {
             queueMutex.unlock();
             this_thread::sleep_for(chrono::seconds(1));
+            queueMutex.lock();
         }
 
         tagEntry = hashtagQueue.front();
         hashtagQueue.pop();
 
-        if(tagEntry.compare("stop") == 0)
+        if(tagEntry.compare("stop") == 0 || tagEntry.compare("STOP") == 0)
             moreData = false;
 
         queueMutex.unlock();

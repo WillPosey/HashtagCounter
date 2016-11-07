@@ -20,7 +20,7 @@
 class HashtagProcessor
 {
 public:
-    HashtagProcessor(HashtagQueue tagQ);
+    HashtagProcessor(HashtagQueue& tagQ);
     void StartProcessing();
 private:
     bool IsQuery(string check);
@@ -37,7 +37,7 @@ private:
 
     unordered_map<string, Node*> hashTable;
     unordered_map<Node*, string> reverseHashTable;  // so you don't have to linearly search hash table when doing removeMax
-    HashtagQueue tagQueue;
+    HashtagQueue& tagQueue;
     MaxFibonacciHeap fibonacciHeap;
     QueryWriter writer;
 };

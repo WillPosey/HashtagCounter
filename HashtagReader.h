@@ -19,11 +19,10 @@
 class HashtagReader
 {
 public:
-    HashtagReader(string inputFilename, HashtagQueue tagQ);
-    void ReadHashtags();
+    HashtagReader(string inputFilename, HashtagQueue& tagQ);
+    void ReadHashtags(HashtagQueue& tagQ);
 private:
     ifstream inStream;
-    HashtagQueue& tagQueue;
     thread readThread;
 };
 

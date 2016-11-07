@@ -9,19 +9,23 @@
  ******************************************************************************************/
 #include "HashtagReader.h"
 
+#include <iostream>
+#include <functional>
+
 /**************************************************************
  * 		HashtagReader Constructor
  **************************************************************/
-HashtagReader::HashtagReader(string inputFilename, HashtagQueue tagQ) : tagQueue(tagQ)
+HashtagReader::HashtagReader(string inputFilename, HashtagQueue& tagQ)
 {
     inStream.open(inputFilename.c_str());
-    readThread = thread(&HashtagReader::ReadHashtags, this);
+    readThread = thread(&HashtagReader::ReadHashtags, this, ref(tagQ));
+    readThread.detach();
 }
 
 /**************************************************************
  * 		HashtagReader::ReadHashtags
  **************************************************************/
-void HashtagReader::ReadHashtags()
+void HashtagReader::ReadHashtags(HashtagQueue& tagQueue)
 {
     string line;
     while(getline(inStream, line))

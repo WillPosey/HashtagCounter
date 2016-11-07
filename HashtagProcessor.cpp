@@ -10,15 +10,15 @@
 #include "HashtagProcessor.h"
 
 #include <cstring>
+#include <iostream>
 
 /**************************************************************
  * 		HashtagProcessor Constructor
  **************************************************************/
-HashtagProcessor::HashtagProcessor(HashtagQueue tagQ) : tagQueue(tagQ)
+HashtagProcessor::HashtagProcessor(HashtagQueue& tagQ) : tagQueue(tagQ)
 {
     // init fibheap
     fibonacciHeap.Initialize();
-
 }
 
 /**************************************************************
@@ -122,7 +122,7 @@ string HashtagProcessor::GetMostFrequentHashtags(int numHashtags)
  **************************************************************/
 void HashtagProcessor::GetHashtag(string input, string& hashtag)
 {
-    hashtag = input.substr(0, input.find(' '));
+    hashtag = input.substr(1, input.find(' ')-1);
 }
 
 /**************************************************************
