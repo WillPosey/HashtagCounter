@@ -108,7 +108,9 @@ string HashtagProcessor::GetMostFrequentHashtags(int numHashtags)
     for(int i=0; i<numHashtags; i++)
     {
         nodeArray[i] = fibonacciHeap.RemoveMax();
-        hashtags += reverseHashTable[nodeArray[i]] + ",";
+        hashtags += reverseHashTable[nodeArray[i]];
+        if(i < numHashtags-1)
+            hashtags += ",";
     }
     for(int i=0; i<numHashtags; i++)
         fibonacciHeap.Insert(nodeArray[i]);
