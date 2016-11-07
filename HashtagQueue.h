@@ -24,6 +24,7 @@ class HashtagQueue
 public:
     // Constructor
     HashtagQueue(){moreData = true;}
+    HashtagQueue(const HashtagQueue& copyQ){moreData = copyQ.moreData;}
 
     // Reads the front of the queue
     bool ReadQueue(string& tagEntry)

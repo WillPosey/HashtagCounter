@@ -131,7 +131,7 @@ void HashtagProcessor::GetHashtag(string input, string& hashtag)
 void HashtagProcessor::GetHashtagFreqeuncy(string input, int& frequency)
 {
     int start = input.find(' ')+1;
-    string freqStr = input.substr(start, input.length - start);
+    string freqStr = input.substr(start, input.length() - start);
     frequency = atoi(freqStr.c_str());
 }
 

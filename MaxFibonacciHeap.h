@@ -11,6 +11,7 @@
 #define MAX_FIBONACCI_HEAP_H
 
 #include <vector>
+#include <cstddef>
 
 struct Node
 {
@@ -22,9 +23,11 @@ struct Node
     long degree;
     long value;
 
-    Node() : parent(NULL), leftSibling(this), rightSibling(this), child(NULL)
-             childCut(false), degree(0), value(0)
+    Node() : parent(NULL), leftSibling(this), rightSibling(this), child(NULL),
+             childCut(false), degree(0), value(0) {}
 };
+
+using namespace std;
 
 class MaxFibonacciHeap
 {
@@ -34,20 +37,25 @@ public:
     void IncreaseKey(Node* n, int amount);
     Node* RemoveMax();
 private:
-    Node* maxPointer;
+    int GetNumTopLevel();
     void PlaceTopLevel(Node* n);
     void CascadeCut(Node* n);
     void RemoveNode(Node* n);
-    void SetMaxPointer(Node* n);
+    void SetNewMaxPointer();
     void Consolidate();
+    Node* Meld(Node* positionalNode, Node* moveNode);
     void LinkNewNode(Node* left, Node* insertNode, Node* right);
     void LinkSiblings(Node* n);
+    void AddToChildList(Node* parent, Node* newChild);
     void CompareToMax(Node* n);
     bool CheckIfChildPtr(Node* n);
-    void AssignParentNewChild(Node* oldChild);
+    void AssignParentNewChildPtr(Node* oldChild);
     void PlaceChildrenTopLevel(Node* n);
     bool CheckForSiblings(Node* n);
     vector<Node*> GetChildrenList(Node* n);
+
+    Node* maxPointer;
+    bool mustConsolidate;
 };
 
 #endif /* MAX_FIBONACCI_HEAP_H */

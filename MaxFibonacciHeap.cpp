@@ -16,6 +16,7 @@
 void MaxFibonacciHeap::Initialize()
 {
     maxPointer = NULL;
+    mustConsolidate = false;
 }
 
 /**************************************************************
@@ -105,9 +106,10 @@ void MaxFibonacciHeap::IncreaseKey(Node* n, int amount)
             /* CascadeCut() from increased key node parent's position */
             /* Combine same order heaps in top level list */
             Node* nParent = n->parent;
-            AssignParentNewChild(n);
+            AssignParentNewChildPtr(n);
             PlaceTopLevel(n);
             CascadeCut(nParent);
+            mustConsolidate = true;
             Consolidate();
         }
 
@@ -123,9 +125,8 @@ Node* MaxFibonacciHeap::RemoveMax()
     /* regular remove, then consolidate top level list */
     /* set then new max pointer */
     Node* retMax = maxPointer;
-    maxPointer = maxPointer->rightSibling;      // temporary
+    SetNewMaxPointer();
     RemoveNode(retMax);
-    SetMaxPointer(temp);
     return retMax;
 }
 
@@ -144,7 +145,7 @@ void MaxFibonacciHeap::RemoveNode(Node* n)
 
     PlaceChildrenTopLevel(n);
 
-    AssignParentNewChild(n);
+    AssignParentNewChildPtr(n);
     CascadeCut(n->parent);
 
     Consolidate();
@@ -158,26 +159,27 @@ void MaxFibonacciHeap::PlaceChildrenTopLevel(Node* n)
 {
     if(n->degree)
     {
+        mustConsolidate = true;
         vector<Node*> childrenList = GetChildrenList(n);
-        for(vector<Node*>iterator it = childrenList.begin(), it < childrenList.end(), it++)
-        PlaceTopLevel(*it);
+        for(vector<Node*>::iterator it = childrenList.begin(); it < childrenList.end(); it++)
+            PlaceTopLevel(*it);
     }
 }
 
 /**************************************************************
- * 		MaxFibonacciHeap::AssignParentNewChild
+ * 		MaxFibonacciHeap::AssignParentNewChildPtr
  *
  **************************************************************/
-void MaxFibonacciHeap::AssignParentNewChild(Node* oldChild)
+void MaxFibonacciHeap::AssignParentNewChildPtr(Node* oldChild)
 {
-    if(n->parent != NULL)
+    if(oldChild->parent != NULL)
     {
-        if(CheckIfChildPtr(n))
+        if(CheckIfChildPtr(oldChild))
         {
-            if(CheckForSiblings(n))
-                n->parent->child = n->rightSibling;
+            if(CheckForSiblings(oldChild))
+                oldChild->parent->child = oldChild->rightSibling;
             else
-                n->parent->child = NULL;
+                oldChild->parent->child = NULL;
         }
     }
 }
@@ -190,6 +192,7 @@ void MaxFibonacciHeap::PlaceTopLevel(Node* n)
 {
     /* Place into top level through the use of the maxPointer */
     LinkNewNode(maxPointer, n, maxPointer->rightSibling);
+    n->parent = NULL;
     CompareToMax(n);
 }
 
@@ -198,21 +201,50 @@ void MaxFibonacciHeap::PlaceTopLevel(Node* n)
  **************************************************************/
 void MaxFibonacciHeap::CascadeCut(Node* n)
 {
-    if(n->childCut)
+    // remember to set mustConsolidate if needed
+    if(n != NULL)
     {
-
+        if(n->parent != NULL)
+        {
+            if(n->childCut)
+            {
+                mustConsolidate = true;
+                LinkSiblings(n);
+                AssignParentNewChildPtr(n);
+                Node* parent = n->parent;
+                PlaceTopLevel(n);
+                CascadeCut(parent);
+            }
+            else
+                n->childCut = true;
+        }
+        else
+            n->childCut = false;
     }
-    else
-        n->childCut = true;
 }
 
 /**************************************************************
- * 		MaxFibonacciHeap::SetMaxPointer
+ * 		MaxFibonacciHeap::SetNewMaxPointer
  **************************************************************/
-void MaxFibonacciHeap::SetMaxPointer(Node* n)
+void MaxFibonacciHeap::SetNewMaxPointer()
 {
     // traverse top level list (temporary max set)
     // compare and get max
+    Node* currentNode = maxPointer->rightSibling;
+    Node* start = maxPointer;
+    Node* tempMax = maxPointer->rightSibling;
+    if(maxPointer == maxPointer->rightSibling)
+        maxPointer = NULL;
+    else
+    {
+        while(currentNode != start)
+        {
+            if(tempMax->value < currentNode->value)
+                tempMax = currentNode;
+            currentNode = currentNode->rightSibling;
+        }
+        maxPointer = tempMax;
+    }
 }
 
 /**************************************************************
@@ -238,11 +270,106 @@ void MaxFibonacciHeap::LinkSiblings(Node* n)
 }
 
 /**************************************************************
+ * 		MaxFibonacciHeap::LinkSiblings
+ *
+ **************************************************************/
+void MaxFibonacciHeap::AddToChildList(Node* parent, Node* newChild)
+{
+    if(parent->child)
+        LinkNewNode(parent->child, newChild, parent->child->rightSibling);
+    else
+    {
+        parent->child = newChild;
+        newChild->leftSibling = newChild;
+        newChild->rightSibling = newChild;
+    }
+    newChild->parent = parent;
+    parent->degree++;
+}
+
+/**************************************************************
+ * 		MaxFibonacciHeap::GetNumTopLevel
+ *
+ **************************************************************/
+int MaxFibonacciHeap::GetNumTopLevel()
+{
+    int numTopLevel = 0;
+    Node* start = maxPointer;
+    Node* currentNode;
+    for(currentNode = start; currentNode->rightSibling != start; currentNode = currentNode->rightSibling)
+        numTopLevel++;
+    return numTopLevel;
+}
+
+/**************************************************************
  * 		MaxFibonacciHeap::Consolidate
+ *
  **************************************************************/
 void MaxFibonacciHeap::Consolidate()
 {
+    vector<Node*> ranks;
+    int currentRank, numRoots, numSteps;
+    Node* currentNode;
 
+    if(mustConsolidate)
+    {
+        mustConsolidate = false;
+        numRoots = GetNumTopLevel();
+        for(currentNode = maxPointer, numSteps = 0; numSteps < numRoots; numSteps++, currentNode = currentNode->rightSibling)
+        {
+            currentRank = currentNode->degree;
+
+            /* No node has had this rank yet */
+            if(ranks.size() <= currentRank)
+            {
+                /* Fill vector with null node pointers until reaching capacity of currentRank */
+                while(ranks.size() <= currentRank)
+                    ranks.push_back(NULL);
+                ranks[currentRank] = currentNode;
+                continue;
+            }
+
+            /* Combine same degree trees */
+            while(ranks[currentRank] != NULL)
+            {
+                /* Meld and clear index in ranks vector, increment rank */
+                currentNode = Meld(currentNode, ranks[currentRank]);
+                ranks[currentRank] = NULL;
+                currentRank++;
+                if(ranks.size() <= currentRank)
+                    ranks.push_back(NULL);
+            }
+            ranks[currentRank] = currentNode;
+        }
+    }
+}
+
+/**************************************************************
+ * 		MaxFibonacciHeap::Meld
+ **************************************************************/
+Node* MaxFibonacciHeap::Meld(Node* positionalNode, Node* moveNode)
+{
+    if(positionalNode->value >= moveNode->value)
+    {
+        /* remove moveNode from current level sibling list */
+        /* Add moveNode to child list of positionalNode */
+        LinkSiblings(moveNode);
+        AddToChildList(positionalNode, moveNode);
+        return positionalNode;
+    }
+    else
+    {
+        /* save positionalNode's siblings from current level sibling list */
+        /* remove moveNode from current level sibling list */
+        /* palcer moveNode at positionalNode's position in sibling list */
+        /* Add positionalNode to child list of moveNode */
+        Node* right = positionalNode->rightSibling;
+        Node* left = positionalNode->leftSibling;
+        LinkSiblings(moveNode);
+        LinkNewNode(left, moveNode, right);
+        AddToChildList(moveNode, positionalNode);
+        return moveNode;
+    }
 }
 
 
