@@ -44,10 +44,14 @@ int main(int argc, char** argv)
     HashtagQueue tagQueue;                          /* Queue used for reader and writer synchronization */
     HashtagReader tagReader (argv[1], tagQueue);    /* Construct HashtagReader and start thread */
     HashtagProcessor tagProcessor (tagQueue);       /* Construct HashtagProcessor */
-    tagProcessor.StartProcessing();                 /* Process Hashtag frequencies and queries */
+
+    /* Process Hashtag frequencies and queries */
+    tagProcessor.StartProcessing();
 
 	return 0;
 }
+
+
 
 
 
